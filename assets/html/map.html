@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <title>Firebase a Leaflet Map</title>
+ <meta charset="utf-8" />
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" />
+ <style>
+   html,
+   body {
+     margin: 0;
+     padding: 0;
+   }
+
+   #map {
+     width: 100vw;
+     height: 100vh;
+   }
+ </style>
+</head>
+
+<body>
+ <div id="map"></div>
+ <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+ <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
+ <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+
+ <!-- Add the Firebase products that you want to use -->
+ <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+
+ <script>
+   // Your web app's Firebase configuration
+   const firebaseConfig = {
+     apiKey: "AIzaSyAsqkgIj3q39vS6DIWL3HRmVY24WLaDVQA",
+     authDomain: "database09-3bf99.firebaseapp.com",
+     databaseURL: "https://database09-3bf99-default-rtdb.firebaseio.com",
+     projectId: "database09-3bf99",
+     storageBucket: "database09-3bf99.firebasestorage.app",
+     messagingSenderId: "530631795631",
+     appId: "1:530631795631:web:92ca91375cc7a5eb89c55a"
+   };
+
+   // Initialize Firebase
+   firebase.initializeApp(firebaseConfig);
+   const database = firebase.database();
+
+   // Initialize the map
+   const map = L.map('map').setView([-7.7956, 110.3695], 13);
+
+   // Add a tile layer (the map background)
+   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+   }).addTo(map);
+
+   // Store markers by ID to track and update them
+   const markers = {};
+
+   // Get a reference to the database service
+   const pointsRef = database.ref("/points");
+
+   // Delete point function
+   function deletePoint(key) {
+     // confirm
+     if (confirm("Yakin akan menghapus point ini?")) {
+       pointsRef.child(key).remove();
+     }
+   }
+
+   // Attach an asynchronous callback to read the data at our posts reference
+   pointsRef.on('value', (e) => {
+     const data = e.val();
+     console.log(data);
+     
+     if (data) {
+       // Get all current keys from database
+       const currentKeys = Object.keys(data);
+       
+       // Remove markers that no longer exist in the database
+       Object.keys(markers).forEach((key) => {
+         if (!currentKeys.includes(key)) {
+           map.removeLayer(markers[key].marker);
+           delete markers[key];
+         }
+       });
+       
+       // Add or update markers
+       currentKeys.forEach((key) => {
+         const point = data[key];
+         if (point.coordinates) {
+           //change coordinates to float
+           const coordinates = point.coordinates.split(",").map(parseFloat);
+           console.log(coordinates);
+           
+           // Check if marker already exists
+           if (markers[key]) {
+             // Update existing marker position
+             markers[key].marker.setLatLng(coordinates);
+             // Update popup
+             const popup = `${point.name}<br>${coordinates}<br><button onclick="deletePoint('${key}')"><i class="fa-solid fa-trash"></i> Delete</button>`;
+             markers[key].marker.setPopupContent(popup);
+           } else {
+             // Create new marker
+             const marker = L.marker(coordinates).addTo(map);
+             const popup = `${point.name}<br>${coordinates}<br><button onclick="deletePoint('${key}')"><i class="fa-solid fa-trash"></i> Delete</button>`;
+             if (point.name) {
+               marker.bindPopup(popup);
+             }
+             // Store marker with its key
+             markers[key] = { marker: marker, coordinates: coordinates };
+           }
+         }
+       });
+     } else {
+       // Clear all markers if no data
+       Object.keys(markers).forEach((key) => {
+         map.removeLayer(markers[key].marker);
+       });
+       markers = {};
+     }
+   }, (errorObject) => {
+     console.log("The read failed: " + errorObject.name);
+   });
+ </script>
+</body>
+</html>

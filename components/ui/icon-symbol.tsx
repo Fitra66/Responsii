@@ -1,29 +1,31 @@
-// Fallback for using MaterialIcons on Android and web.
+// Fallback for using FontAwesome5 on Android and web.
 
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { SymbolWeight, SymbolViewProps } from 'expo-symbols';
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import { SymbolViewProps, SymbolWeight } from 'expo-symbols';
 import { ComponentProps } from 'react';
 import { OpaqueColorValue, type StyleProp, type TextStyle } from 'react-native';
 
-type IconMapping = Record<SymbolViewProps['name'], ComponentProps<typeof MaterialIcons>['name']>;
+type IconMapping = Record<SymbolViewProps['name'], ComponentProps<typeof FontAwesome5>['name']>;
 type IconSymbolName = keyof typeof MAPPING;
 
 /**
- * Add your SF Symbols to Material Icons mappings here.
- * - see Material Icons in the [Icons Directory](https://icons.expo.fyi).
+ * Add your SF Symbols to FontAwesome 5 mappings here.
+ * - see FontAwesome 5 in the [Icons Directory](https://icons.expo.fyi).
  * - see SF Symbols in the [SF Symbols](https://developer.apple.com/sf-symbols/) app.
  */
 const MAPPING = {
-  'house.fill': 'home',
-  'paperplane.fill': 'send',
-  'chevron.left.forwardslash.chevron.right': 'code',
+  'map.fill': 'map-marked-alt',
+  'list.bullet': 'list-ul',
+  'cloud.sun.fill': 'cloud-sun',
   'chevron.right': 'chevron-right',
-} as IconMapping;
+  'bell.fill': 'bell',
+  'chart.bar.fill': 'chart-bar',
+};
 
 /**
- * An icon component that uses native SF Symbols on iOS, and Material Icons on Android and web.
+ * An icon component that uses native SF Symbols on iOS, and FontAwesome 5 on Android and web.
  * This ensures a consistent look across platforms, and optimal resource usage.
- * Icon `name`s are based on SF Symbols and require manual mapping to Material Icons.
+ * Icon `name`s are based on SF Symbols and require manual mapping to FontAwesome 5.
  */
 export function IconSymbol({
   name,
@@ -37,5 +39,5 @@ export function IconSymbol({
   style?: StyleProp<TextStyle>;
   weight?: SymbolWeight;
 }) {
-  return <MaterialIcons color={color} size={size} name={MAPPING[name]} style={style} />;
+  return <FontAwesome5 color={color} size={size} name={MAPPING[name]} style={style} />;
 }

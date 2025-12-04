@@ -16,7 +16,8 @@ export default function RootLayout() {
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+        <Stack.Screen name="forminputlocation" options={{ title: 'Lapor Hujan' }} />
+        <Stack.Screen name="formeditlocation" options={{ title: 'Edit Laporan' }} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
